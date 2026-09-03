@@ -1,0 +1,97 @@
+{
+  "@@locale": "en",
+  "appTitle": "CleanRoll",
+  "appTagline": "Clean your gallery one photo at a time.",
+  "allowAccess": "Allow access",
+  "openSettings": "Open settings",
+  "permissionNeeded": "CleanRoll needs access to your photos so you can choose which ones to keep or remove.",
+  "permissionPermanentlyDenied": "Photo access is turned off. Enable it in system settings to clean your gallery.",
+  "couldNotLoadAlbums": "Couldn’t load albums",
+  "checkPhotoPermissions": "Please check your photo permissions and try again.",
+  "tryAgain": "Try again",
+  "noPhotosToReview": "No photos to review",
+  "noAccessiblePhotos": "There are no accessible photos available to clean.",
+  "photoCount": "{count, plural, =1{1 photo} other{{count} photos}}",
+  "@photoCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "albumEmpty": "This album has no photos available to review.",
+  "albumLoadFailed": "We couldn’t load photos from this album. Please try again.",
+  "chooseOrder": "Choose an order",
+  "orderNewestTitle": "Newest first",
+  "orderNewestSubtitle": "Start with your most recent photos",
+  "orderOldestTitle": "Oldest first",
+  "orderOldestSubtitle": "Start with your oldest photos",
+  "orderRandomTitle": "Random",
+  "orderRandomSubtitle": "Shuffle the album once and review",
+  "settings": "Settings",
+  "appearance": "Appearance",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "System",
+  "language": "Language",
+  "languageEnglish": "English",
+  "languageSpanish": "Spanish",
+  "languageCatalan": "Catalan",
+  "languageSystem": "System",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu",
+  "delete": "Delete",
+  "keep": "Keep",
+  "review": "Review",
+  "undo": "Undo",
+  "markedCount": "{count} marked",
+  "@markedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "swipeKeep": "KEEP",
+  "swipeDelete": "DELETE",
+  "nothingSelected": "Nothing selected",
+  "nothingToDelete": "Nothing to delete",
+  "photosSelected": "{count, plural, =1{1 photo selected} other{{count} photos selected}}",
+  "@photosSelected": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "reviewHintContinue": "Mark photos for deletion while cleaning, then review them here.",
+  "reviewKeptAll": "You kept all the photos in this session.",
+  "deletePhotos": "{count, plural, =1{Delete 1 photo} other{Delete {count} photos}}",
+  "@deletePhotos": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "startNewSession": "Start new session",
+  "continueCleaning": "Continue",
+  "noPhotosDeleted": "No photos were deleted.",
+  "deleteFailedKeepSelection": "Some photos couldn’t be deleted. They have not been removed from your selection.",
+  "closePreview": "Close preview",
+  "allDone": "All done!",
+  "partlyDone": "Partly done",
+  "nothingWasDeleted": "Nothing was deleted",
+  "photosRemoved": "{count, plural, =1{1 photo removed.} other{{count} photos removed.}}",
+  "@photosRemoved": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "photosCouldNotBeRemoved": "{count, plural, =1{1 photo could not be removed.} other{{count} photos could not be removed.}}",
+  "@photosCouldNotBeRemoved": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "partialDeletionSummary": "{deleted} deleted. {failed} could not be removed.",
+  "@partialDeletionSummary": {
+    "placeholders": {
+      "deleted": {"type": "int"},
+      "failed": {"type": "int"}
+    }
+  },
+  "done": "Done"
+}

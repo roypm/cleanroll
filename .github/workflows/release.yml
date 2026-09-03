@@ -1,0 +1,92 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build APK and publish release
+    runs-on: ubuntu-latest
+    # Avoid infinite loop when this workflow commits the version bump.
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore: release') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Bump patch version
+        id: version
+        run: |
+          set -euo pipefail
+          line=$(grep '^version:' pubspec.yaml | head -n1)
+          # Expect: version: X.Y.Z+BUILD
+          semver=$(echo "$line" | sed -E 's/^version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+)\+.*/\1/')
+          build=$(echo "$line" | sed -E 's/^version:[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+\+([0-9]+).*/\1/')
+          IFS=. read -r major minor patch <<<"$semver"
+          patch=$((patch + 1))
+          build=$((build + 1))
+          new_semver="${major}.${minor}.${patch}"
+          new_version="${new_semver}+${build}"
+          sed -i -E "s/^version:[[:space:]].*/version: ${new_version}/" pubspec.yaml
+          echo "semver=${new_semver}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${new_semver}" >> "$GITHUB_OUTPUT"
+          echo "version=${new_version}" >> "$GITHUB_OUTPUT"
+          echo "Bumped to ${new_version}"
+
+      - name: Pub get
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Commit version bump
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pubspec.yaml
+          git commit -m "chore: release ${{ steps.version.outputs.tag }}"
+          git tag "${{ steps.version.outputs.tag }}"
+          git push origin HEAD:main
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Prepare APK asset
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk \
+            "CleanRoll-${{ steps.version.outputs.tag }}.apk"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: CleanRoll ${{ steps.version.outputs.tag }}
+          body: |
+            CleanRoll ${{ steps.version.outputs.tag }}
+
+            Download the APK and install it on Android (allow install from unknown sources if prompted).
+          files: CleanRoll-${{ steps.version.outputs.tag }}.apk
+          generate_release_notes: true
