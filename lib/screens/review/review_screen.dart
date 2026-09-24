@@ -58,12 +58,18 @@ class _ReviewScreenState extends State<ReviewScreen> {
       final result = await widget.photoService.deletePhotos(selected);
       if (!mounted) return;
 
+      if (result.cancelled) {
+        setState(() => _deleting = false);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l10n.deletionNotConfirmed)));
+        return;
+      }
+
       if (result.successCount == 0) {
         setState(() => _deleting = false);
-        if (result.cancelled || result.failureCount > 0) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(l10n.noPhotosDeleted)));
-        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.deleteFailedKeepSelection)));
         return;
       }
 

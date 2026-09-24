@@ -175,6 +175,99 @@ void main() {
     expect(ids, isNot(equals(['a', 'b', 'c'])));
   });
 
+  test('incomplete newest session keeps platform order', () {
+    final controller = CleaningController(
+      album: const AlbumInfo(id: 'album', name: 'Camera', assetCount: 10),
+      orderMode: OrderMode.newestFirst,
+      photos: [
+        PhotoItem(id: 'older', createdAt: DateTime(2020, 1, 1)),
+        PhotoItem(id: 'newer', createdAt: DateTime(2024, 1, 1)),
+      ],
+      totalCount: 10,
+      catalogComplete: false,
+    );
+
+    expect(controller.photos.map((p) => p.id), ['older', 'newer']);
+    expect(controller.isCatalogComplete, isFalse);
+    expect(controller.totalCount, 10);
+  });
+
+  test('appending photos does not move the current index', () {
+    final controller = CleaningController(
+      album: const AlbumInfo(id: 'album', name: 'Camera', assetCount: 4),
+      orderMode: OrderMode.oldestFirst,
+      photos: [
+        PhotoItem(id: 'a', createdAt: DateTime(2024, 1, 1)),
+        PhotoItem(id: 'b', createdAt: DateTime(2024, 1, 2)),
+      ],
+      totalCount: 4,
+      catalogComplete: false,
+    );
+
+    controller.keep();
+    expect(controller.currentIndex, 1);
+
+    controller.appendPhotos([
+      PhotoItem(id: 'c', createdAt: DateTime(2024, 1, 3)),
+      PhotoItem(id: 'd', createdAt: DateTime(2024, 1, 4)),
+      PhotoItem(id: 'b', createdAt: DateTime(2024, 1, 2)),
+    ]);
+
+    expect(controller.currentIndex, 1);
+    expect(controller.currentPhoto?.id, 'b');
+    expect(controller.isFinished, isFalse);
+    expect(controller.photos.map((p) => p.id), ['a', 'b', 'c', 'd']);
+  });
+
+  test('session does not finish until the catalog is complete', () {
+    final controller = CleaningController(
+      album: const AlbumInfo(id: 'album', name: 'Camera', assetCount: 2),
+      orderMode: OrderMode.newestFirst,
+      photos: [PhotoItem(id: 'a', createdAt: DateTime(2024, 2, 1))],
+      totalCount: 2,
+      catalogComplete: false,
+    );
+
+    controller.keep();
+    expect(controller.isFinished, isFalse);
+    expect(controller.isWaitingForMore, isTrue);
+    expect(controller.canContinueCleaning, isTrue);
+    expect(controller.totalCount, 2);
+
+    controller.appendPhotos([
+      PhotoItem(id: 'b', createdAt: DateTime(2024, 1, 1)),
+    ]);
+    expect(controller.currentIndex, 1);
+    expect(controller.currentPhoto?.id, 'b');
+    expect(controller.isWaitingForMore, isFalse);
+
+    controller.completeCatalog();
+    expect(controller.isCatalogComplete, isTrue);
+    expect(controller.isFinished, isFalse);
+
+    controller.keep();
+    expect(controller.isFinished, isTrue);
+    expect(controller.currentPhoto, isNull);
+  });
+
+  test('completing a short catalog uses the photos that arrived', () {
+    final controller = CleaningController(
+      album: const AlbumInfo(id: 'album', name: 'Camera', assetCount: 5),
+      orderMode: OrderMode.oldestFirst,
+      photos: [PhotoItem(id: 'a', createdAt: DateTime(2024, 1, 1))],
+      totalCount: 5,
+      catalogComplete: false,
+    );
+
+    controller.keep();
+    expect(controller.isWaitingForMore, isTrue);
+
+    controller.completeCatalog();
+    expect(controller.totalCount, 1);
+    expect(controller.isFinished, isTrue);
+    expect(controller.isWaitingForMore, isFalse);
+  });
+
   test('session finishes after last photo', () {
     final controller = CleaningController(
       album: _album,

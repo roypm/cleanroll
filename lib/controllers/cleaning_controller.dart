@@ -14,10 +14,19 @@ class CleaningController extends ChangeNotifier {
     required this.album,
     required this.orderMode,
     required List<PhotoItem> photos,
+    int? totalCount,
+    bool catalogComplete = true,
     Random? random,
   }) : _photos = List<PhotoItem>.from(photos),
+       _totalCount = totalCount ?? photos.length,
        _random = random ?? Random() {
-    _applyOrder();
+    _catalogComplete = catalogComplete;
+    if (_catalogComplete) {
+      _applyOrder();
+      _totalCount = _photos.length;
+    } else if (_totalCount < _photos.length) {
+      _totalCount = _photos.length;
+    }
   }
 
   final AlbumInfo album;
@@ -26,6 +35,9 @@ class CleaningController extends ChangeNotifier {
 
   final List<PhotoItem> _photos;
   int _currentIndex = 0;
+  int _totalCount;
+  bool _catalogComplete = true;
+  bool _closed = false;
   final LinkedHashSet<String> _keptIds = LinkedHashSet<String>();
   final LinkedHashSet<String> _deleteIds = LinkedHashSet<String>();
   final List<SessionDecision> _undoStack = <SessionDecision>[];
@@ -34,9 +46,19 @@ class CleaningController extends ChangeNotifier {
 
   List<PhotoItem> get photos => List.unmodifiable(_photos);
   int get currentIndex => _currentIndex;
-  int get totalCount => _photos.length;
+  int get loadedCount => _photos.length;
+  int get totalCount => _totalCount;
+  bool get isCatalogComplete => _catalogComplete;
+  bool get isClosed => _closed;
   bool get hasPhotos => _photos.isNotEmpty;
-  bool get isFinished => _currentIndex >= _photos.length;
+
+  /// True only after every photo has been loaded and reviewed.
+  bool get isFinished => _catalogComplete && _currentIndex >= _photos.length;
+
+  /// The user reached the loaded photos while later pages are still arriving.
+  bool get isWaitingForMore =>
+      !_catalogComplete && _currentIndex >= _photos.length;
+
   bool get canUndo => _undoStack.isNotEmpty;
   int get undoCount => _undoStack.length;
   bool get canContinueCleaning => !isFinished;
@@ -47,11 +69,13 @@ class CleaningController extends ChangeNotifier {
   int get displayIndex {
     if (!hasPhotos) return 0;
     if (isFinished) return totalCount;
-    return _currentIndex + 1;
+    final next = _currentIndex + 1;
+    if (next > totalCount) return totalCount;
+    return next;
   }
 
   PhotoItem? get currentPhoto {
-    if (isFinished || !hasPhotos) return null;
+    if (_currentIndex < 0 || _currentIndex >= _photos.length) return null;
     return _photos[_currentIndex];
   }
 
@@ -121,6 +145,39 @@ class CleaningController extends ChangeNotifier {
   void deselect(String photoId) {
     if (!_deleteIds.remove(photoId)) return;
     notifyListeners();
+  }
+
+  /// Adds later pages at the end. Does not move [currentIndex].
+  void appendPhotos(List<PhotoItem> more) {
+    if (_closed || _catalogComplete || more.isEmpty) return;
+
+    final existing = _photos.map((photo) => photo.id).toSet();
+    var added = false;
+    for (final photo in more) {
+      if (existing.add(photo.id)) {
+        _photos.add(photo);
+        added = true;
+      }
+    }
+    if (!added) return;
+    notifyListeners();
+  }
+
+  /// Marks the album list as fully loaded.
+  ///
+  /// The progress total becomes the number of photos that actually arrived,
+  /// so a short load does not leave the session waiting.
+  void completeCatalog() {
+    if (_closed || _catalogComplete) return;
+    _catalogComplete = true;
+    _totalCount = _photos.length;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _closed = true;
+    super.dispose();
   }
 
   void _applyOrder() {

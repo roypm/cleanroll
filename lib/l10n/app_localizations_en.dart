@@ -13,7 +13,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'CleanRoll';
 
   @override
-  String get appTagline => 'Clean your gallery one photo at a time.';
+  String get appTagline => 'Pick an album';
 
   @override
   String get allowAccess => 'Allow access';
@@ -187,6 +187,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noPhotosDeleted => 'No photos were deleted.';
+
+  @override
+  String get deletionNotConfirmed =>
+      'Deletion wasn’t confirmed. These photos are still selected.';
 
   @override
   String get deleteFailedKeepSelection =>

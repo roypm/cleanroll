@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../app/theme.dart';
-
 class SwipeablePhoto extends StatefulWidget {
   const SwipeablePhoto({
     super.key,
@@ -29,6 +27,9 @@ class _SwipeablePhotoState extends State<SwipeablePhoto>
   late final AnimationController _settle;
 
   static const _threshold = 120.0;
+  static const _stampAngle = 0.26;
+  static const _stampTop = 40.0;
+  static const _stampSide = 28.0;
 
   @override
   void initState() {
@@ -101,8 +102,8 @@ class _SwipeablePhotoState extends State<SwipeablePhoto>
 
   @override
   Widget build(BuildContext context) {
-    final keepOpacity = (_dx / _threshold).clamp(0.0, 1.0);
-    final deleteOpacity = (-_dx / _threshold).clamp(0.0, 1.0);
+    final keepProgress = (_dx / _threshold).clamp(0.0, 1.0);
+    final deleteProgress = (-_dx / _threshold).clamp(0.0, 1.0);
     final scheme = Theme.of(context).colorScheme;
 
     return GestureDetector(
@@ -114,34 +115,72 @@ class _SwipeablePhotoState extends State<SwipeablePhoto>
           angle: _rotation,
           child: Stack(
             fit: StackFit.expand,
+            clipBehavior: Clip.none,
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: widget.child,
               ),
               Positioned(
-                top: AppSpacing.lg,
-                left: AppSpacing.lg,
-                child: Opacity(
-                  opacity: deleteOpacity,
-                  child: _SwipeBadge(
-                    label: widget.deleteLabel,
-                    color: scheme.error,
-                  ),
+                top: _stampTop,
+                left: _stampSide,
+                right: _stampSide,
+                child: _SwipeStamp(
+                  label: widget.keepLabel,
+                  color: scheme.primary,
+                  progress: keepProgress,
+                  angle: -_stampAngle,
+                  alignment: Alignment.topLeft,
                 ),
               ),
               Positioned(
-                top: AppSpacing.lg,
-                right: AppSpacing.lg,
-                child: Opacity(
-                  opacity: keepOpacity,
-                  child: _SwipeBadge(
-                    label: widget.keepLabel,
-                    color: scheme.primary,
-                  ),
+                top: _stampTop,
+                left: _stampSide,
+                right: _stampSide,
+                child: _SwipeStamp(
+                  label: widget.deleteLabel,
+                  color: scheme.error,
+                  progress: deleteProgress,
+                  angle: _stampAngle,
+                  alignment: Alignment.topRight,
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SwipeStamp extends StatelessWidget {
+  const _SwipeStamp({
+    required this.label,
+    required this.color,
+    required this.progress,
+    required this.angle,
+    required this.alignment,
+  });
+
+  final String label;
+  final Color color;
+  final double progress;
+  final double angle;
+  final Alignment alignment;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Align(
+        alignment: alignment,
+        child: Opacity(
+          opacity: progress,
+          child: Transform.rotate(
+            angle: angle,
+            child: Transform.scale(
+              scale: 0.85 + 0.15 * progress,
+              child: _SwipeBadge(label: label, color: color),
+            ),
           ),
         ),
       ),
@@ -157,19 +196,25 @@ class _SwipeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: color, width: 3),
-        borderRadius: BorderRadius.circular(8),
-        color: color.withValues(alpha: 0.12),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.2,
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: color, width: 4),
+          borderRadius: BorderRadius.circular(8),
+          color: color.withValues(alpha: 0.12),
+        ),
+        child: Text(
+          label,
+          maxLines: 1,
+          style: TextStyle(
+            color: color,
+            fontSize: 32,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2,
+            height: 1,
+          ),
         ),
       ),
     );

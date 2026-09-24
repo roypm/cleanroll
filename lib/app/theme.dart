@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
-const Color _seed = Color(0xFF1F6F5B);
+/// Mid violet from the same family as the lilac app icon (`#C9A8F0`).
+const Color _seed = Color(0xFF6F5A96);
+
+const Color _darkSurface = Color(0xFF241E30);
+const Color _darkSurfaceContainerLow = Color(0xFF2C263A);
+const Color _darkSurfaceContainer = Color(0xFF342C44);
+const Color _darkSurfaceContainerHigh = Color(0xFF3C3450);
+const Color _darkSurfaceContainerHighest = Color(0xFF463C5C);
 
 ThemeData buildAppTheme({Brightness brightness = Brightness.light}) {
   final colorScheme = ColorScheme.fromSeed(
@@ -41,7 +48,21 @@ ThemeData buildAppTheme({Brightness brightness = Brightness.light}) {
 
 ThemeData buildLightTheme() => buildAppTheme(brightness: Brightness.light);
 
-ThemeData buildDarkTheme() => buildAppTheme(brightness: Brightness.dark);
+ThemeData buildDarkTheme() {
+  final theme = buildAppTheme(brightness: Brightness.dark);
+  final scheme = theme.colorScheme.copyWith(
+    surface: _darkSurface,
+    surfaceContainerLow: _darkSurfaceContainerLow,
+    surfaceContainer: _darkSurfaceContainer,
+    surfaceContainerHigh: _darkSurfaceContainerHigh,
+    surfaceContainerHighest: _darkSurfaceContainerHighest,
+  );
+  return theme.copyWith(
+    colorScheme: scheme,
+    scaffoldBackgroundColor: scheme.surface,
+    appBarTheme: theme.appBarTheme.copyWith(backgroundColor: scheme.surface),
+  );
+}
 
 abstract final class AppSpacing {
   static const double xs = 4;

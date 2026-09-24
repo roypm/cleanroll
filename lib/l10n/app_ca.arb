@@ -1,7 +1,7 @@
 {
   "@@locale": "ca",
   "appTitle": "CleanRoll",
-  "appTagline": "Neteja la galeria foto a foto.",
+  "appTagline": "Tria un àlbum",
   "allowAccess": "Permetre l’accés",
   "openSettings": "Obrir la configuració",
   "permissionNeeded": "CleanRoll necessita accés a les teves fotos perquè puguis triar quines conservar o eliminar.",
@@ -49,6 +49,7 @@
   "startNewSession": "Sessió nova",
   "continueCleaning": "Continuar",
   "noPhotosDeleted": "No s’ha eliminat cap foto.",
+  "deletionNotConfirmed": "No s’ha confirmat l’eliminació. Les fotos continuen seleccionades.",
   "deleteFailedKeepSelection": "Algunes fotos no s’han pogut eliminar. Continuen a la selecció.",
   "closePreview": "Tancar la previsualització",
   "allDone": "Fet!",

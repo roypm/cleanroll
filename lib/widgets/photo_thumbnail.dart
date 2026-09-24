@@ -28,6 +28,18 @@ class _PhotoThumbnailState extends State<PhotoThumbnail> {
   @override
   void initState() {
     super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant PhotoThumbnail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.photoId != widget.photoId || oldWidget.size != widget.size) {
+      _load();
+    }
+  }
+
+  void _load() {
     _future = widget.photoService.thumbnailBytes(
       widget.photoId,
       size: widget.size,
@@ -35,18 +47,15 @@ class _PhotoThumbnailState extends State<PhotoThumbnail> {
   }
 
   @override
-  void didUpdateWidget(covariant PhotoThumbnail oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.photoId != widget.photoId || oldWidget.size != widget.size) {
-      _future = widget.photoService.thumbnailBytes(
-        widget.photoId,
-        size: widget.size,
-      );
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final cached = widget.photoService.cachedThumbnail(
+      widget.photoId,
+      size: widget.size,
+    );
+    if (cached != null) {
+      return Image.memory(cached, fit: widget.fit, gaplessPlayback: true);
+    }
+
     return FutureBuilder<Uint8List?>(
       future: _future,
       builder: (context, snapshot) {

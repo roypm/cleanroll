@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
@@ -111,10 +113,10 @@ class _HomeScreenState extends State<HomeScreen>
     final l10n = AppLocalizations.of(context);
 
     try {
-      final photos = await _photoService.getPhotosForAlbum(album.id);
+      final start = await _photoService.loadAlbumStart(album.id, mode);
       if (!mounted) return;
 
-      if (photos.isEmpty) {
+      if (start.photos.isEmpty) {
         setState(() => _starting = false);
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(l10n.albumEmpty)));
@@ -124,8 +126,14 @@ class _HomeScreenState extends State<HomeScreen>
       final controller = CleaningController(
         album: album,
         orderMode: mode,
-        photos: photos,
+        photos: start.photos,
+        totalCount: start.totalCount,
+        catalogComplete: start.catalogComplete,
       );
+
+      if (!start.catalogComplete) {
+        unawaited(_photoService.loadRemainingPhotos(controller));
+      }
 
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
@@ -141,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen>
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(l10n.albumLoadFailed)));
     } finally {
+      _photoService.cancelAlbumPaging();
       if (mounted) setState(() => _starting = false);
     }
   }
@@ -167,14 +176,9 @@ class _HomeScreenState extends State<HomeScreen>
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.sm,
-                    AppSpacing.md,
-                    AppSpacing.lg,
-                    AppSpacing.md,
-                  ),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       IconButton(
                         onPressed: _toggleDrawer,
@@ -188,26 +192,23 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: AppSpacing.sm),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.appTitle,
-                                style: theme.textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.appTitle,
+                              style: theme.textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
                               ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                l10n.appTagline,
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              l10n.appTagline,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

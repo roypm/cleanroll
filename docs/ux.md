@@ -40,7 +40,8 @@ No tabs. Settings live only in the home drawer.
 The home screen is the album grid with a light brand header.
 
 - hamburger (animated menu/close) on the **left** of the header
-- title: CleanRoll + short tagline
+- title: CleanRoll + a short line that says to pick an album
+- header uses the same horizontal inset as the album grid; the line matches the photo-count style
 - 2-column grid of square album covers (name + photo count)
 - tapping an album opens an order bottom sheet
 - if permission is missing, show the permission explanation on this same screen (Allow access / Open settings)

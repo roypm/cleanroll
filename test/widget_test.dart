@@ -15,6 +15,6 @@ void main() {
     await tester.pump();
 
     expect(find.text('CleanRoll'), findsOneWidget);
-    expect(find.textContaining('one photo at a time'), findsOneWidget);
+    expect(find.text('Pick an album'), findsOneWidget);
   });
 }
