@@ -29,10 +29,13 @@ class _CleaningScreenState extends State<CleaningScreen> {
   CleaningController get _controller => widget.controller;
   bool _handedOff = false;
 
+  static const int _photoSize = 900;
+
   @override
   void initState() {
     super.initState();
     _controller.addListener(_onSessionChanged);
+    _prefetchNearby();
   }
 
   @override
@@ -53,7 +56,25 @@ class _CleaningScreenState extends State<CleaningScreen> {
       });
       return;
     }
+    _prefetchNearby();
     setState(() {});
+  }
+
+  void _prefetchNearby() {
+    final index = _controller.currentIndex;
+    final photos = _controller.photos;
+    if (index - 1 >= 0) {
+      widget.photoService.prefetchThumbnail(
+        photos[index - 1].id,
+        size: _photoSize,
+      );
+    }
+    if (index + 1 < photos.length) {
+      widget.photoService.prefetchThumbnail(
+        photos[index + 1].id,
+        size: _photoSize,
+      );
+    }
   }
 
   Future<void> _openReview({bool replace = false}) async {
@@ -127,7 +148,7 @@ class _CleaningScreenState extends State<CleaningScreen> {
                           child: PhotoThumbnail(
                             photoId: photo.id,
                             photoService: widget.photoService,
-                            size: 900,
+                            size: _photoSize,
                             fit: BoxFit.contain,
                           ),
                         ),

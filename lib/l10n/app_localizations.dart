@@ -109,7 +109,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTagline.
   ///
   /// In en, this message translates to:
-  /// **'Clean your gallery one photo at a time.'**
+  /// **'Pick an album'**
   String get appTagline;
 
   /// No description provided for @allowAccess.
@@ -393,6 +393,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No photos were deleted.'**
   String get noPhotosDeleted;
+
+  /// No description provided for @deletionNotConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Deletion wasn’t confirmed. These photos are still selected.'**
+  String get deletionNotConfirmed;
 
   /// No description provided for @deleteFailedKeepSelection.
   ///

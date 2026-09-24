@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
   "appTitle": "CleanRoll",
-  "appTagline": "Clean your gallery one photo at a time.",
+  "appTagline": "Pick an album",
   "allowAccess": "Allow access",
   "openSettings": "Open settings",
   "permissionNeeded": "CleanRoll needs access to your photos so you can choose which ones to keep or remove.",
@@ -69,6 +69,7 @@
   "startNewSession": "Start new session",
   "continueCleaning": "Continue",
   "noPhotosDeleted": "No photos were deleted.",
+  "deletionNotConfirmed": "Deletion wasn’t confirmed. These photos are still selected.",
   "deleteFailedKeepSelection": "Some photos couldn’t be deleted. They have not been removed from your selection.",
   "closePreview": "Close preview",
   "allDone": "All done!",

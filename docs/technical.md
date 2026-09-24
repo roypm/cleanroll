@@ -114,7 +114,7 @@ Handle results explicitly:
 - partial failure
 - cancelled when supported
 
-UI must never claim more deletions than actually succeeded.
+An empty id list from the platform delete call is a cancellation (the system dialog was dismissed, or nothing was removed). It is not a failure. A thrown platform error is a failure: stay on Review and keep the selection. The UI must not describe a cancellation as a failure, and must never claim more deletions than actually succeeded.
 
 ---
 
@@ -133,6 +133,9 @@ UI must never claim more deletions than actually succeeded.
 - avoid loading full-resolution images for every swipe
 - cleaning screen only needs current / nearby photos
 - review grid uses small thumbnails
+- newest and oldest sessions open after the first page of photos; the rest load in the background. The session is not finished until that load completes and the user has reviewed every loaded photo
+- random still loads the full list and shuffles once before the first photo
+- thumbnail bytes are cached in memory; the cleaning screen prefetches the next and previous photo
 - optimize only after a real performance problem
 
 ---
@@ -141,6 +144,8 @@ UI must never claim more deletions than actually succeeded.
 
 Centralize spacing, typography, colors, and button styles in a small theme.
 Do not build a full design system early.
+
+The palette follows the lilac app icon. Dark mode uses lifted violet surfaces instead of the near-black generated from the seed. Delete stays the theme error red.
 
 ---
 

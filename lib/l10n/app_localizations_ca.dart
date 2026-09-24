@@ -13,7 +13,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get appTitle => 'CleanRoll';
 
   @override
-  String get appTagline => 'Neteja la galeria foto a foto.';
+  String get appTagline => 'Tria un àlbum';
 
   @override
   String get allowAccess => 'Permetre l’accés';
@@ -186,6 +186,10 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get noPhotosDeleted => 'No s’ha eliminat cap foto.';
+
+  @override
+  String get deletionNotConfirmed =>
+      'No s’ha confirmat l’eliminació. Les fotos continuen seleccionades.';
 
   @override
   String get deleteFailedKeepSelection =>
